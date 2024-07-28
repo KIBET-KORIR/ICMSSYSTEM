@@ -2,46 +2,88 @@
 // Include the database connection
 include '../Database/db_con.php';
 
-// Check if form fields are set and not empty
-if (isset($_POST['id_number'], $_POST['name'], $_POST['email'], $_POST['idtype'], $_POST['mobile_no'], $_POST['password'])) {
-    // Get form data
-    $id_number = $_POST['id_number'];
-    $name = $_POST['name'];
-    $email = $_POST['email'];
-    $idtype = $_POST['idtype'];
-    $mobile_no = $_POST['mobile_no'];
-    $password = $_POST['password'];
+// Include PHPMailer
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
 
-    // Prepare update query
-    $update_query = "UPDATE users SET name=?, email=?, idtype=?, mobile_no=?, password=? WHERE id_number=?";
+require '../PHPMailer/src/Exception.php';
+require '../PHPMailer/src/PHPMailer.php';
+require '../PHPMailer/src/SMTP.php';
 
-    // Initialize a statement
-    if ($stmt = mysqli_prepare($conn, $update_query)) {
-        // Bind parameters
-        mysqli_stmt_bind_param($stmt, "sssssi", $name, $email, $idtype, $mobile_no, $password, $id_number);
+// Function to generate a random password
+function generateRandomPassword($length = 8) {
+    $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    $password = '';
+    for ($i = 0; $i < $length; $i++) {
+        $password .= $characters[rand(0, strlen($characters) - 1)];
+    }
+    return $password;
+}
 
-        // Execute the statement
-        if (mysqli_stmt_execute($stmt)) {
-            // Redirect to the page where you list the user records
-            header("Location: manage_users.php?message=User record updated successfully");
+// Check if the form is submitted
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Retrieve form data and sanitize
+    $id_number = mysqli_real_escape_string($conn, $_POST['id_number']);
+    $name = mysqli_real_escape_string($conn, $_POST['name']);
+    $email = mysqli_real_escape_string($conn, $_POST['email']);
+    $idtype = mysqli_real_escape_string($conn, $_POST['idtype']);
+    $mobile_no = mysqli_real_escape_string($conn, $_POST['mobile_no']);
+
+    // Generate a random password
+    $randomPassword = generateRandomPassword();
+
+    // Hash the random password before saving it to the database
+    $hashedPassword = password_hash($randomPassword, PASSWORD_DEFAULT);
+
+    // Update the user record with new details and password
+    $update_query = "UPDATE users SET name = '$name', email = '$email', idtype = '$idtype', mobile_no = '$mobile_no', password = '$hashedPassword' WHERE id_number = '$id_number'";
+
+    if (mysqli_query($conn, $update_query)) {
+        // Send email with new password
+        $mail = new PHPMailer(true);
+
+        try {
+                // Server settings
+                $mail->isSMTP();
+                $mail->Host = 'smtp.gmail.com'; // Set the SMTP server to send through
+                $mail->SMTPAuth = true;
+                $mail->Username = 'kibetg984@gmail.com'; // SMTP username
+                $mail->Password = 'qsgr ffuz syic piuz'; // SMTP password
+                $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+                $mail->Port = 587;
+
+                // Recipients
+                $mail->setFrom('kibetg984@gmail.com', 'Sondu Police Station');
+                $mail->addAddress($police_email, $name); // Add a recipient
+
+            // Content
+            $mail->isHTML(true);
+            $mail->Subject = 'Your New Password';
+            $mail->Body    = "
+                <div style='font-family: Arial, sans-serif; color: #333;'>
+                    <h2>Your New Password</h2>
+                    <p>Dear $name,</p>
+                    <p>Your new password is: <strong>$randomPassword</strong></p>
+                    <p>Please change it after logging in.</p>
+                    <p>Best regards,</p>
+                    <p>Your Company</p>
+                </div>";
+
+            $mail->send();
+
+            // Redirect back to the user management page with a success message
+            header("Location: manage_users.php?success=Password updated successfully! Temporary password sent to the email.");
             exit();
-        } else {
-            // Redirect with an error message if execution failed
-            header("Location: manage_users.php?error=Failed to update user record");
+        } catch (Exception $e) {
+            // Redirect back to the user management page with an error message
+            header("Location: manage_users.php?error=Error sending email: {$mail->ErrorInfo}");
             exit();
         }
-
-        // Close the statement
-        mysqli_stmt_close($stmt);
     } else {
-        // Redirect with an error message if preparation failed
-        header("Location: manage_users.php?error=Failed to prepare statement");
+        // Redirect back to the user management page with an error message
+        header("Location: manage_users.php?error=Error updating password: " . mysqli_error($conn));
         exit();
     }
-} else {
-    // Redirect with an error message if form fields are not set or empty
-    header("Location: manage_users.php?error=All fields are required");
-    exit();
 }
 
 // Close the database connection

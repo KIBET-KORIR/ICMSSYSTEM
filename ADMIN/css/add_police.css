@@ -14,13 +14,15 @@ h2 {
     margin-bottom: 20px;
 }
 
-form {
+.form-container {
+    width: 80%; /* Adjust width as needed */
+    max-width: 400px; /* Limit maximum width */
     background: #fff;
-    padding: 40px;
+    padding: 20px 40px;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    width: 100%;
-    max-width: 400px;
+    overflow-y: auto; /* Enable vertical scrolling */
+    max-height: 80vh; /* Limit maximum height */
     box-sizing: border-box;
 }
 
@@ -32,10 +34,11 @@ label {
 
 input[type="text"],
 input[type="email"],
-input[type="password"] {
+input[type="password"],
+select {
     width: 100%;
     padding: 10px;
-    margin-bottom: 20px;
+    margin-bottom: 10px; /* Adjust as needed */
     border: 1px solid #ccc;
     border-radius: 5px;
     box-sizing: border-box;

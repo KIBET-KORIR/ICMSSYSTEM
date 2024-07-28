@@ -25,7 +25,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $email = isset($_POST['email']) ? mysqli_real_escape_string($conn, $_POST['email']) : '';
     $id_number = isset($_POST['id_number']) ? mysqli_real_escape_string($conn, $_POST['id_number']) : '';
     $mobile_no = isset($_POST['mobile_no']) ? mysqli_real_escape_string($conn, $_POST['mobile_no']) : '';
-    $location = issGet($_POST['location']) ? mysqli_real_escape_string($conn, $_POST['location']) : '';
+    $location = isset($_POST['location']) ? mysqli_real_escape_string($conn, $_POST['location']) : '';
     $occurence_date = isset($_POST['occurence_date']) ? mysqli_real_escape_string($conn, $_POST['occurence_date']) : '';
     $occurence_time = isset($_POST['occurence_time']) ? mysqli_real_escape_string($conn, $_POST['occurence_time']) : '';
     $description = isset($_POST['description']) ? mysqli_real_escape_string($conn, $_POST['description']) : '';
@@ -180,8 +180,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     ?>
                 </select><br><br>
                 Date of Occurrence: <input type="date" name="occurence_date" id="datepicker" required><br><br>
-    Time of Occurrence: <input type="time" name="occurence_time" id="timepicker" required><br><br>
-    <div id="errDateTimeMsgO" style="color: red;"></div>
+                Time of Occurrence: <input type="time" name="occurence_time" id="timepicker" required><br><br>
+                <div id="errDateTimeMsgO" style="color: red;"></div>
 
                 Description: <textarea name="description" required></textarea><br><br>
                 Upload ID: <input type="file" name="image" required><br><br>

@@ -4,7 +4,7 @@ include '../Database/db_con.php';
 include 'constants/sidebar.php';
 
 // Define variables to store form data
-$police_id = $police_email = $password = '';
+$police_id = $police_email = $password = $name = $rank = $police_id_number = '';
 $error_message = '';
 $success_message = '';
 
@@ -14,6 +14,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $police_id = mysqli_real_escape_string($conn, $_POST['police_id']);
     $police_email = mysqli_real_escape_string($conn, $_POST['police_email']);
     $password = mysqli_real_escape_string($conn, $_POST['password']);
+    $name = mysqli_real_escape_string($conn, $_POST['name']);
+    $rank = mysqli_real_escape_string($conn, $_POST['rank']);
+    $police_id_number = mysqli_real_escape_string($conn, $_POST['police_id_number']);
 
     // Check for duplicate police_id
     $check_id_query = "SELECT * FROM police WHERE police_id = '$police_id'";
@@ -31,7 +34,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $error_message = "Error: Police Email already exists!";
     } else {
         // Insert the police record into the database
-        $insert_query = "INSERT INTO police (police_id, police_email, password) VALUES ('$police_id', '$police_email', '$password')";
+        $insert_query = "INSERT INTO police (police_id, police_email, password, name, rank, police_id_number)
+                         VALUES ('$police_id', '$police_email', '$password', '$name', '$rank', '$police_id_number')";
         if (mysqli_query($conn, $insert_query)) {
             // Set success message
             $success_message = "Police officer added successfully!";
@@ -52,6 +56,48 @@ mysqli_close($conn);
     <title>Add Police</title>
     <link rel="stylesheet" href="css/add_police.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: Arial, sans-serif;
+        }
+        .form-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            padding-top: 60px; /* Adjust this value according to the height of your navbar */
+        }
+        form {
+            background-color: #f2f2f2;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        form label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        form input, form select, form button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        form button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+        }
+        form button:hover {
+            background-color: #45a049;
+        }
+    </style>
 </head>
 <body>
     <?php if (!empty($error_message)): ?>
@@ -73,14 +119,34 @@ mysqli_close($conn);
             });
         </script>
     <?php endif; ?>
-    <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
-        <label for="police_id">Police ID:</label>
-        <input type="text" id="police_id" name="police_id" required><br><br>
-        <label for="police_email">Police Email:</label>
-        <input type="email" id="police_email" name="police_email" required><br><br>
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required><br><br>
-        <button type="submit">Add Police</button>
-    </form>
+
+    <div class="form-container">
+        <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
+            <label for="police_id">Police ID:</label>
+            <input type="text" id="police_id" name="police_id" required>
+
+            <label for="police_email">Police Email:</label>
+            <input type="email" id="police_email" name="police_email" required>
+
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required>
+
+            <label for="rank">Rank:</label>
+            <select id="rank" name="rank" required>
+                <option value="Constable">Constable</option>
+                <option value="Corporal">Corporal</option>
+                <!-- Add other options as needed -->
+            </select>
+
+            <label for="police_id_number">ID Number:</label>
+            <input type="text" id="police_id_number" name="police_id_number" required>
+
+            <button type="submit">Add Police</button>
+        </form>
+    </div>
+
 </body>
 </html>

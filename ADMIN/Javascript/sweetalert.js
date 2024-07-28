@@ -1,5 +1,4 @@
-
-function confirmUpdate(policeId, policeEmail) {
+function confirmUpdate(policeId, policeEmail, name, rank, policeIdNumber) {
     Swal.fire({
         title: 'Update Confirmation',
         text: "Do you want to update the details?",
@@ -10,15 +9,19 @@ function confirmUpdate(policeId, policeEmail) {
         confirmButtonText: 'Yes, update it!'
     }).then((result) => {
         if (result.isConfirmed) {
-            showUpdateForm(policeId, policeEmail);
+            showUpdateForm(policeId, policeEmail, name, rank, policeIdNumber);
         }
     });
 }
 
-function showUpdateForm(policeId, policeEmail) {
+function showUpdateForm(policeId, policeEmail, name, rank, policeIdNumber) {
     document.getElementById('updatePoliceId').value = policeId;
     document.getElementById('updatePoliceEmail').value = policeEmail;
-    document.getElementById('updateFormContainer').style.display = "flex";
+    document.getElementById('updateName').value = name;
+    document.getElementById('updateRank').value = rank;
+    document.getElementById('updatePoliceIdNumber').value = policeIdNumber;
+    document.getElementById('updateFormContainer').style.display = 'block';
+    document.getElementById('updateFormContainer').scrollIntoView({ behavior: 'smooth' });
 }
 
 function showDeleteAlert(event, policeId) {
@@ -45,9 +48,6 @@ function closeUpdateForm() {
     document.getElementById('updateFormContainer').style.display = "none";
 }
 
-
-
-
 function showEndScheduleAlert(policeId) {
     Swal.fire({
         title: 'Are you sure?',
@@ -67,15 +67,15 @@ function showEndScheduleAlert(policeId) {
                 preConfirm: () => {
                     const endDateTime = Swal.getPopup().querySelector('#endDateTime').value;
                     if (!endDateTime) {
-                        Swal.showValidationMessage(`Please enter a date and time`);
+                        Swal.showValidationMessage(`Please enter an end date and time`);
                     }
-                    return endDateTime;
+                    return { endDateTime: endDateTime };
                 }
             }).then((result) => {
                 if (result.isConfirmed) {
-                    const endDateTime = result.value;
+                    const endDateTime = result.value.endDateTime;
                     const form = document.createElement('form');
-                    form.method = 'POST';
+                    form.method = 'post';
                     form.action = 'end_schedule.php';
 
                     const policeIdField = document.createElement('input');

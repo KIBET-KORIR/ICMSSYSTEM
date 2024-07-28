@@ -63,8 +63,6 @@ $result = mysqli_query($conn, $fetch_query);
                 <input type="text" name="idtype" id="updateIdType" required>
                 <label for="mobile_no">Mobile No:</label>
                 <input type="text" name="mobile_no" id="updateMobileNo" required>
-                <label for="password">Password:</label>
-                <input type="password" name="password" id="updatePassword" required>
                 <button type="submit">Update</button>
                 <button type="button" onclick="closeUpdateForm()">Cancel</button>
             </form>
@@ -82,9 +80,8 @@ $result = mysqli_query($conn, $fetch_query);
         </div>
     </div>
 
-    
     <script src="Javascript/sweetalertuser.js"></script>
-   <link rel="stylesheet" href="css/sweetalertuser.css">
+    <link rel="stylesheet" href="css/sweetalertuser.css">
 <?php
 // Close the database connection
 mysqli_close($conn);

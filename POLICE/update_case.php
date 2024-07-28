@@ -1,5 +1,5 @@
 <?php include '../Database/db_con.php'; ?>
-<?php include 'constants/sidebar.php'; ?>
+<?php include 'CONSTANTS/sidebar_header.php'; ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,6 +8,8 @@
     <title>Case Records</title>
     <!-- SweetAlert CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <!-- FontAwesome CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -53,51 +55,17 @@
             color: #fff;
             cursor: pointer;
         }
-        .verified {
-            background-color: green;
+        .pending {
+            background-color: gray;
         }
-        .declined {
+        .under-investigation {
+            background-color: orange;
+        }
+        .case-closed {
             background-color: red;
         }
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgb(0,0,0);
-            background-color: rgba(0,0,0,0.4);
-        }
-        .modal-content {
-            background-color: #fefefe;
-            margin: 15% auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 80%;
-            box-shadow: 0 5px 15px rgba(0,0,0,.5);
-        }
-        .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-        }
-        .close:hover,
-        .close:focus {
-            color: black;
-            text-decoration: none;
-            cursor: pointer;
-        }
-        .escalate-button {
-            background-color: #ff9800;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
+        .fa-clock {
+            margin-right: 5px;
         }
     </style>
 </head>
@@ -119,10 +87,8 @@
         $search_query = " WHERE id_number = '$search'";
     }
 
-    $query = "SELECT 'declined' AS table_name, name, id_number, mobile_no, location, occurence_date, description, status, 'Declined' AS status_text 
-              FROM declined $search_query
-              UNION ALL
-              SELECT 'verified' AS table_name, name, id_number, mobile_no, location, occurence_date, description, status, 'Verified' AS status_text 
+    $query = "SELECT name, id_number, mobile_no, location, occurence_date, description, status, ob_number, investigation_status, 
+              IFNULL(case_status, 'Pending') AS case_status, email 
               FROM verified $search_query";
 
     $result = $conn->query($query);
@@ -135,17 +101,18 @@
                     <th>Mobile Number</th>
                     <th>Location</th>
                     <th>Occurence Date</th>
-                    <th>Status</th>
+                    <th>Case Status</th>
                 </tr>";
         while ($row = $result->fetch_assoc()) {
-            $status_class = $row['table_name'] == 'verified' ? 'verified' : 'declined';
+            $status_class = strtolower(str_replace(' ', '-', $row['case_status']));
+            $icon = $row['case_status'] == 'Pending' ? '<i class="fas fa-clock"></i>' : '';
             echo "<tr>
                     <td>{$row['name']}</td>
                     <td>{$row['id_number']}</td>
                     <td>{$row['mobile_no']}</td>
                     <td>{$row['location']}</td>
                     <td>{$row['occurence_date']}</td>
-                    <td><button class='status-button $status_class' onclick='showDetails(".json_encode($row).")'>{$row['status_text']}</button></td>
+                    <td><button class='status-button $status_class' onclick='confirmUpdateStatus(" . json_encode($row) . ")'>{$icon} {$row['case_status']}</button></td>
                 </tr>";
         }
         echo "</table>";
@@ -156,56 +123,73 @@
     $conn->close();
     ?>
 
-    <!-- The Modal -->
-    <div id="myModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal()">&times;</span>
-            <div id="case-details"></div>
-            <button class="escalate-button" onclick="escalateCase()">Escalate Case</button>
-        </div>
-    </div>
-
     <!-- SweetAlert2 JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        function showDetails(caseDetails) {
-            const modal = document.getElementById("myModal");
-            const caseDetailsDiv = document.getElementById("case-details");
-            caseDetailsDiv.innerHTML = `
+        function confirmUpdateStatus(caseDetails) {
+            let currentStatus = caseDetails.case_status;
+            let newStatus = currentStatus === 'Pending' ? 'Under Investigation' : 'Case Closed';
+
+            let caseInfo = `
                 <p><strong>Name:</strong> ${caseDetails.name}</p>
                 <p><strong>ID Number:</strong> ${caseDetails.id_number}</p>
                 <p><strong>Mobile Number:</strong> ${caseDetails.mobile_no}</p>
                 <p><strong>Location:</strong> ${caseDetails.location}</p>
                 <p><strong>Occurence Date:</strong> ${caseDetails.occurence_date}</p>
                 <p><strong>Description:</strong> ${caseDetails.description}</p>
-                <p><strong>Status:</strong> ${caseDetails.status_text}</p>
+                <p><strong>Current Status:</strong> ${caseDetails.case_status}</p>
             `;
-            modal.style.display = "block";
-        }
 
-        function closeModal() {
-            const modal = document.getElementById("myModal");
-            modal.style.display = "none";
-        }
-
-        function escalateCase() {
             Swal.fire({
-                title: 'Case Escalated!',
-                text: 'The case has been escalated successfully.',
-                icon: 'success',
-                confirmButtonText: 'OK'
+                title: 'Update Case Status',
+                html: caseInfo + `
+                    <textarea id="updateReason" rows="4" cols="50" placeholder="Enter reason for status update"></textarea>
+                `,
+                showCancelButton: true,
+                confirmButtonText: 'Update',
+                cancelButtonText: 'Cancel',
+                preConfirm: () => {
+                    const updateReason = Swal.getPopup().querySelector('#updateReason').value;
+                    if (!updateReason) {
+                        Swal.showValidationMessage(`Please enter a reason`);
+                    }
+                    return { updateReason: updateReason };
+                }
             }).then((result) => {
                 if (result.isConfirmed) {
-                    closeModal();
+                    sendUpdate(caseDetails, newStatus, result.value.updateReason);
                 }
             });
         }
 
-        window.onclick = function(event) {
-            const modal = document.getElementById("myModal");
-            if (event.target == modal) {
-                modal.style.display = "none";
-            }
+        function sendUpdate(caseDetails, newStatus, updateReason) {
+            fetch('update_case_status.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ caseDetails: caseDetails, newStatus: newStatus, updateReason: updateReason })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        title: 'Success!',
+                        text: 'The case status has been updated successfully and the user has been notified.',
+                        icon: 'success',
+                        confirmButtonText: 'OK'
+                    }).then(() => {
+                        location.reload(); // Refresh the page to show the updated status
+                    });
+                } else {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'There was an error updating the case status.',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            });
         }
     </script>
 

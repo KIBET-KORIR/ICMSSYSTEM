@@ -51,8 +51,7 @@
             <ul class="menu_items submenu">
               <a href="add_police.php" class="nav_link sublink"><i class="fas fa-plus-circle"></i>Add-Police</a>
               <a href="manage_police.php" class="nav_link sublink"><i class="fas fa-user-times"></i>Manage Police</a>
-              <a href="manage_users.php" class="nav_link sublink"><i class="fas fa-user-minus"></i>Manage User</a>
-              <a href="view_cases.php" class="nav_link sublink"><i class="fas fa-briefcase"></i>View Cases</a>
+              <a href="manage_users.php" class="nav_link sublink"><i class="fas fa-user-minus"></i>Manage Citizen</a>
             </ul>
           </li>
 

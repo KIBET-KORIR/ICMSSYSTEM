@@ -1,31 +1,134 @@
 <?php
 // Include the database connection
 include '../Database/db_con.php';
+include 'constants/sidebar.php';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $police_id = $_POST['police_id'];
-    $police_email = $_POST['police_email'];
-    $password = $_POST['password'];
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
 
-    // Hash the password
-    $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+require '../PHPMailer/src/Exception.php';
+require '../PHPMailer/src/PHPMailer.php';
+require '../PHPMailer/src/SMTP.php';
 
-    // Update the police details in the database
-    $update_query = "UPDATE police SET police_email = ?, password = ? WHERE police_id = ?";
-    $stmt = $conn->prepare($update_query);
-    $stmt->bind_param('ssi', $police_email, $hashed_password, $police_id);
+// Define variables to store form data
+$police_id = '';
+$error_message = '';
+$success_message = '';
 
-    if ($stmt->execute()) {
-        echo "Record updated successfully";
-    } else {
-        echo "Error updating record: " . $conn->error;
+// Function to generate a random password
+function generateRandomPassword($length = 8) {
+    $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    $password = '';
+    for ($i = 0; $i < $length; $i++) {
+        $password .= $characters[rand(0, strlen($characters) - 1)];
     }
-
-    $stmt->close();
-    $conn->close();
-
-    // Redirect back to the police details page
-    header("Location: manage_police.php");
-    exit();
+    return $password;
 }
+
+// Check if the form is submitted
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Retrieve form data and sanitize
+    $police_id = mysqli_real_escape_string($conn, $_POST['police_id']);
+
+    // Generate a random password
+    $randomPassword = generateRandomPassword();
+
+    // Update the police record with new password
+    $update_query = "UPDATE police SET password = '$randomPassword' WHERE police_id = '$police_id'";
+    
+    if (mysqli_query($conn, $update_query)) {
+        // Retrieve police officer details for email
+        $select_query = "SELECT * FROM police WHERE police_id = '$police_id'";
+        $result = mysqli_query($conn, $select_query);
+        
+        if (mysqli_num_rows($result) == 1) {
+            $row = mysqli_fetch_assoc($result);
+            $police_email = $row['police_email'];
+            $name = $row['name'];
+            
+            // Send email with new password
+            $mail = new PHPMailer(true);
+            
+            try {
+                // Server settings
+                $mail->isSMTP();
+                $mail->Host = 'smtp.gmail.com'; // Set the SMTP server to send through
+                $mail->SMTPAuth = true;
+                $mail->Username = 'kibetg984@gmail.com'; // SMTP username
+                $mail->Password = 'qsgr ffuz syic piuz'; // SMTP password
+                $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+                $mail->Port = 587;
+
+                // Recipients
+                $mail->setFrom('kibetg984@gmail.com', 'Sondu Police Station');
+                $mail->addAddress($police_email, $name); // Add a recipient
+
+                // Content
+                $mail->isHTML(true);
+                $mail->Subject = 'Your New Password';
+                $mail->Body    = "
+                    <div style='font-family: Arial, sans-serif; color: #333;'>
+                        <h2>Your New Password</h2>
+                        <p>Dear $name,</p>
+                        <p>Your new password is: <strong>$randomPassword</strong></p>
+                        <p>Please change it after logging in.</p>
+                        <p>Best regards,</p>
+                        <p>Sondu Police Station</p>
+                    </div>";
+
+                $mail->send();
+
+                // Set success message after email is sent
+                $success_message = "Password updated successfully! Temporary password sent to the email.";
+            } catch (Exception $e) {
+                // Error sending email
+                $error_message = "Error sending email: {$mail->ErrorInfo}";
+            }
+        } else {
+            $error_message = "Error: Police officer not found.";
+        }
+    } else {
+        $error_message = "Error updating password: " . mysqli_error($conn);
+    }
+}
+
+// Close the database connection
+mysqli_close($conn);
 ?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Police Officer</title>
+    <link rel="stylesheet" href="css/update_police.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+    <?php if (!empty($error_message)): ?>
+        <script>
+            Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: '<?php echo $error_message; ?>'
+            });
+        </script>
+    <?php endif; ?>
+
+    <?php if (!empty($success_message)): ?>
+        <script>
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: '<?php echo $success_message; ?>'
+            });
+        </script>
+    <?php endif; ?>
+    <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
+        <label for="police_id">Police ID:</label>
+        <input type="text" id="police_id" name="police_id" value="<?php echo $police_id; ?>" required><br><br>
+        
+        <button type="submit">Update Password</button>
+    </form>
+</body>
+</html>

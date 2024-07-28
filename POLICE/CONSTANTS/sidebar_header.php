@@ -39,7 +39,13 @@
               </span>
               <span class="navlink">ASSIGNED CASES</span>
             </a>
-
+            
+            <a href="update_case.php" class="nav_link">
+              <span class="navlink_icon">
+              <i class='bx bx-refresh'></i>
+              </span>
+              <span class="navlink">UPDATE CASE</span>
+            </a>
 
             <a href="update_criminal.php" class="nav_link">
               <span class="navlink_icon">
@@ -47,6 +53,7 @@
               </span>
               <span class="navlink">UPDATE CRIMINALS</span>
             </a>
+
             
 
             <a href="police_logout.php" class="nav_link">
