@@ -99,3 +99,19 @@ form {
     cursor: pointer;
     border-radius: 12px;
 }
+
+.date-time-container {
+    display: flex;
+    gap: 20px; /* Adjust spacing between the groups */
+    align-items: center; /* Align items vertically in the center */
+}
+
+.date-time-group {
+    display: flex;
+    flex-direction: row; /* Place label and input side by side */
+    align-items: center; /* Align label and input vertically */
+}
+
+.date-time-group label {
+    margin-right: 10px; /* Space between label and input */
+}

@@ -61,7 +61,9 @@ $result = mysqli_query($conn, $fetch_query);
             Swal.fire({
                 title: 'Set Schedule',
                 html: `
+                    <h4> Start Date and Time </h4>
                     <input type="datetime-local" id="startDateTime" class="swal2-input" placeholder="Start Date and Time">
+                   <h4> End Date and Time </h4>
                     <input type="datetime-local" id="endDateTime" class="swal2-input" placeholder="End Date and Time">
                 `,
                 confirmButtonText: 'Submit',
@@ -69,8 +71,15 @@ $result = mysqli_query($conn, $fetch_query);
                 preConfirm: () => {
                     const startDateTime = Swal.getPopup().querySelector('#startDateTime').value;
                     const endDateTime = Swal.getPopup().querySelector('#endDateTime').value;
+                    const now = new Date().toISOString().slice(0, 16);
                     if (!startDateTime || !endDateTime) {
                         Swal.showValidationMessage(`Please enter both start and end date and time`);
+                    } else if (startDateTime >= endDateTime) {
+                        Swal.showValidationMessage(`End date must be later than start date`);
+                    } else if (startDateTime < now && endDateTime > now) {
+                        Swal.showValidationMessage(`End date cannot be in the future if start date is in the past`);
+                    } else if (startDateTime === now || endDateTime === now) {
+                        Swal.showValidationMessage(`Current date cannot be used for end date`);
                     }
                     return { startDateTime: startDateTime, endDateTime: endDateTime };
                 }
