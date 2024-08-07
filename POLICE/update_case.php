@@ -63,9 +63,13 @@
         }
         .case-closed {
             background-color: red;
+            cursor: not-allowed; /* Change cursor to indicate it's not clickable */
         }
         .fa-clock {
             margin-right: 5px;
+        }
+        .status-button[disabled] {
+            cursor: not-allowed; /* Ensures the button shows as disabled */
         }
     </style>
 </head>
@@ -106,13 +110,15 @@
         while ($row = $result->fetch_assoc()) {
             $status_class = strtolower(str_replace(' ', '-', $row['case_status']));
             $icon = $row['case_status'] == 'Pending' ? '<i class="fas fa-clock"></i>' : '';
+            $disabled = $row['case_status'] == 'Case Closed' ? 'disabled' : '';
+            $onclick = $row['case_status'] == 'Case Closed' ? '' : "onclick='confirmUpdateStatus(" . json_encode($row) . ")'";
             echo "<tr>
                     <td>{$row['name']}</td>
                     <td>{$row['id_number']}</td>
                     <td>{$row['mobile_no']}</td>
                     <td>{$row['location']}</td>
                     <td>{$row['occurence_date']}</td>
-                    <td><button class='status-button $status_class' onclick='confirmUpdateStatus(" . json_encode($row) . ")'>{$icon} {$row['case_status']}</button></td>
+                    <td><button class='status-button $status_class' $onclick $disabled>{$icon} {$row['case_status']}</button></td>
                 </tr>";
         }
         echo "</table>";

@@ -44,9 +44,9 @@ $result = mysqli_query($conn, $fetch_query);
                         </td>
                         <td>
                             <div class="action-buttons">
-                                <button onclick="showEndScheduleAlert('<?php echo $row['police_id']; ?>')"><i class="fas fa-clock"></i> End Schedule</button>
+                                <button onclick="showEndScheduleAlert('<?php echo $row['police_id']; ?>')"><i class="fas fa-clock"></i> End duty</button>
                                 <?php if ($current_time >= $row['start_disable'] && $current_time <= $row['end_disable']): ?>
-                                    <button onclick="activateUser('<?php echo $row['police_id']; ?>')"><i class="fas fa-check"></i> Activate</button>
+                                    <button onclick="activateUser('<?php echo $row['police_id']; ?>')"><i class="fas fa-check"></i> Activate duty</button>
                                 <?php endif; ?>
                             </div>
                         </td>

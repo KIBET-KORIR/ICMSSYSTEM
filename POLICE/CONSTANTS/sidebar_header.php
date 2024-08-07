@@ -21,8 +21,6 @@
 
       <div class="navbar_content">
         <i class="bi bi-grid"></i>
-        <i class='bx bx-bell' ></i>
-        <img src="images/profile.jpg" alt="" class="profile" />
       </div>
     </nav>
 
@@ -53,6 +51,14 @@
               </span>
               <span class="navlink">UPDATE CRIMINALS</span>
             </a>
+
+
+            <a href="police_duty.php" class="nav_link">
+    <span class="navlink_icon">
+        <i class="bx bx-shield"></i>
+    </span>
+    <span class="navlink">Police on Duty</span>
+</a>
 
             
 

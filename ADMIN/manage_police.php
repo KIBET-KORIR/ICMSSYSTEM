@@ -4,8 +4,12 @@ include '../Database/db_con.php';
 include 'constants/sidebar.php';
 
 // Fetch police records from the database
-$fetch_query = "SELECT police_id, police_email FROM police";
+$fetch_query = "SELECT police_id, name, police_email FROM police";
 $result = mysqli_query($conn, $fetch_query);
+
+if (!$result) {
+    die("Query Failed: " . mysqli_error($conn));
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -17,52 +21,130 @@ $result = mysqli_query($conn, $fetch_query);
     <link rel="stylesheet" href="css/manage_police.css">
 </head>
 <body>
-<div class="container">
-    <div class="form-container">
+    <div class="container">
         <h2>Police Details</h2>
         <table>
-            <tr>
-                <th>Police ID</th>
-                <th>Police Email</th>
-                <th>Actions</th>
-            </tr>
-            <?php while ($row = mysqli_fetch_assoc($result)): ?>
+            <thead>
                 <tr>
-                    <td><?php echo $row['police_id']; ?></td>
-                    <td><?php echo $row['police_email']; ?></td>
-                    <td>
-                        <div class="action-buttons">
-                            <button onclick="confirmUpdate('<?php echo $row['police_id']; ?>', '<?php echo $row['police_email']; ?>')"><i class="fas fa-pen"></i> Update</button>
+                    <th>Police ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php while ($row = mysqli_fetch_assoc($result)): ?>
+                    <tr>
+                        <td><?php echo $row['police_id']; ?></td>
+                        <td><?php echo $row['name']; ?></td>
+                        <td><?php echo $row['police_email']; ?></td>
+                        <td class="action-buttons">
+                            <button class="update-btn" onclick="confirmUpdate('<?php echo $row['police_id']; ?>', '<?php echo $row['police_email']; ?>')">Update</button>
                             <form id="deleteForm_<?php echo $row['police_id']; ?>" action="delete_police.php" method="post" onsubmit="return showDeleteAlert(event, '<?php echo $row['police_id']; ?>');">
                                 <input type="hidden" name="police_id" value="<?php echo $row['police_id']; ?>">
-                                <button type="submit" class="delete"><i class="fas fa-trash"></i> Delete</button>
+                                <button type="submit" class="delete-btn">Delete</button>
                             </form>
-                        </div>
-                    </td>
-                </tr>
-            <?php endwhile; ?>
+                        </td>
+                    </tr>
+                <?php endwhile; ?>
+            </tbody>
         </table>
     </div>
-</div>
 
-<div id="updateFormContainer" class="swal-like">
-    <div class="swal-like-content">
-        <form id="updateForm" action="update_police.php" method="post">
-            <input type="hidden" name="police_id" id="updatePoliceId">
-            <label for="police_email">Police Email:</label>
-            <input type="email" name="police_email" id="updatePoliceEmail" required>
-            <button type="submit">Update</button>
-            <button type="button" onclick="closeUpdateForm()">Cancel</button>
-        </form>
-    </div>
-</div>
+    <script src="Javascript/sweetalert.js"></script>
+    <link rel="stylesheet" href="css/sweetalert.css">
 
-<script src="Javascript/sweetalert.js"></script>
-<link rel="stylesheet" href="css/sweetalert.css">
+    <script>
+        function confirmUpdate(policeId, policeEmail) {
+            Swal.fire({
+                title: 'Update Confirmation',
+                text: "Do you want to update the details?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, update it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    showUpdateForm(policeId, policeEmail);
+                }
+            });
+        }
 
-<?php
-// Close the database connection
-mysqli_close($conn);
-?>
+        function showUpdateForm(policeId, policeEmail) {
+            Swal.fire({
+                title: 'Update Details',
+                html:
+                '<input type="hidden" id="updatePoliceId" value="'+policeId+'">' +
+                '<label for="police_email">Police Email:</label>' +
+                '<input type="email" id="updatePoliceEmail" class="swal2-input" value="'+policeEmail+'">',
+                focusConfirm: false,
+                showCancelButton: true,
+                confirmButtonText: 'Update',
+                cancelButtonText: 'Cancel',
+                preConfirm: () => {
+                    const policeId = Swal.getPopup().querySelector('#updatePoliceId').value
+                    const policeEmail = Swal.getPopup().querySelector('#updatePoliceEmail').value
+                    return { policeId: policeId, policeEmail: policeEmail }
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Send the data to update_police.php
+                    const policeId = result.value.policeId;
+                    const policeEmail = result.value.policeEmail;
+
+                    // Perform AJAX request to update_police.php
+                    fetch('update_police.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                        body: new URLSearchParams({
+                            'police_id': policeId,
+                            'police_email': policeEmail
+                        })
+                    })
+                    .then(response => response.text())
+                    .then(data => {
+                        // Handle the response from update_police.php
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success!',
+                            text: 'Details updated successfully!'
+                        }).then(() => {
+                            location.reload();
+                        });
+                    })
+                    .catch(error => {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error!',
+                            text: 'Error updating details.'
+                        });
+                    });
+                }
+            });
+        }
+
+        function showDeleteAlert(event, policeId) {
+            event.preventDefault(); // Prevent the form from submitting immediately
+
+            Swal.fire({
+                title: 'Delete Confirmation',
+                text: "Are you sure you want to delete this record?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('deleteForm_' + policeId).submit();
+                }
+            });
+
+            return false; // Prevent the form from submitting the traditional way
+        }
+    </script>
 </body>
 </html>

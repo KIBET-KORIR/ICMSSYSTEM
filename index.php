@@ -6,6 +6,40 @@
     <title>Sondu Police Station</title>
     <link rel="stylesheet" href="landing/css/index.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Include the updated dropdown CSS here */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #ffffff;
+            min-width: 200px;
+            box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+            border-radius: 8px;
+            padding: 10px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+
+        .dropdown-content p {
+            margin: 0;
+            padding: 8px 0;
+            color: #333;
+        }
+
+        .dropdown-content p:hover {
+            background-color: #f1f1f1;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -14,11 +48,21 @@
         </div>
         <nav>
             <ul>
-                <li><a href="#">Home</a></li>
-                <li><a href="#">Services</a></li>
-                <li><a href="#">About Us</a></li>
-                <li><a href="#">Contact Us</a></li>
-                <li><a href="#">Careers</a></li>
+                <li><a href="index.php">Home</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropbtn">About Us</a>
+                    <div class="dropdown-content">
+                        <p>We are dedicated to maintaining peace and order in our community. Our mission is to provide high-quality policing services and ensure the safety and security of the citizens we serve.</p>
+                    </div>
+                </li>
+                <li class="dropdown">
+                    <a href="#" class="dropbtn">Contact Us</a>
+                    <div class="dropdown-content">
+                        <p>P.O. Box P.O. Box 48 – 40109 Sondu, Kenya</p>
+                        <p>Phone: 020-3532162</p>
+                        <p>Email: sondustation@sondu.police</p>
+                    </div>
+                </li>
             </ul>
         </nav>
         <div class="auth-buttons">
@@ -37,7 +81,7 @@
         <section class="police">
             <h2>Police on Duty</h2>
             <div id="criminals-container">
-                <!-- Police on duty data will be fetched and displayed here -->
+            <?php include 'landing/constants/police_on_duty.php'; ?>
             </div>
         </section>
         <section class="faqs">
@@ -48,44 +92,14 @@
                     <p>You can report a case by visiting our station, calling our hotline, or using our online reporting system.</p>
                 </div>
             </div>
-            <div class="faq-item">
-                <button class="faq-question">What should I do if I witness a crime?</button>
-                <div class="faq-answer">
-                    <p>If you witness a crime, you should contact the police immediately and provide as much detail as possible.</p>
-                </div>
-            </div>
-            <div class="faq-item">
-                <button class="faq-question">How can I check the status of my report?</button>
-                <div class="faq-answer">
-                    <p>You can check the status of your report by logging into our online system or contacting the station directly.</p>
-                </div>
-            </div>
-            <div class="faq-item">
-                <button class="faq-question">What types of crimes can be reported online?</button>
-                <div class="faq-answer">
-                    <p>You can report various types of crimes online, including theft, vandalism, and non-emergency incidents. For emergencies, please call our hotline.</p>
-                </div>
-            </div>
-            <div class="faq-item">
-                <button class="faq-question">Are anonymous reports accepted?</button>
-                <div class="faq-answer">
-                    <p>Yes, we accept anonymous reports. However, providing contact information can help us follow up on the case more effectively.</p>
-                </div>
-            </div>
-            <div class="faq-item">
-                <button class="faq-question">What should I do if I lost my belongings?</button>
-                <div class="faq-answer">
-                    <p>If you lost your belongings, you should file a lost property report at our station or through our online system.</p>
-                </div>
+            <!-- Additional FAQ items -->
+        </section>
+        <section class="criminals">
+            <h2>Notorious Criminals</h2>
+            <div id="criminals-container">
+            <?php include 'landing/constants/notorious_criminals.php'; ?>
             </div>
         </section>
-    </section>
-    <section class="criminals">
-        <h2>Notorious Criminals</h2>
-        <div id="criminals-container">
-        <?php include 'landing/constants/notorious_criminals.php'; ?>
-        </div>
-    </section>
     </main>
     <footer>
         <div class="social-media">

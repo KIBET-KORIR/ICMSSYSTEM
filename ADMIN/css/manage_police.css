@@ -22,49 +22,80 @@ th {
     background-color: #f2f2f2;
     text-align: left;
 }
+
 td button:last-child {
     margin-bottom: 0;
 }
 
 tr:hover {
-            background-color: #f1f1f1;
-        }
+    background-color: #f1f1f1;
+}
 
-        
-        .action-buttons {
-            display: flex;
-            gap: 8px;
-        }
-        .action-buttons button {
-            background-color: #4CAF50;
-            color: white;
-            padding: 8px 12px;
-            border: none;
-            cursor: pointer;
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-        .action-buttons button.delete {
-            background-color: #f44336;
-        }
-        .action-buttons button:hover {
-            opacity: 0.8;
-        }
-        form {
-            display: inline;
-        }
+.action-buttons {
+    display: flex;
+    gap: 8px;
+}
 
-        .end-schedule {
-            background-color: #f44336;
-            color: white;
-            border: none;
-            padding: 8px 12px;
-            cursor: pointer;
-        }
-        
-        .end-schedule:hover {
-            background-color: #d32f2f;
-        }
-        
+.action-buttons button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 8px 12px;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.action-buttons button.delete {
+    background-color: #f44336;
+}
+
+.action-buttons button:hover {
+    opacity: 0.8;
+}
+
+form {
+    display: inline;
+}
+
+.end-schedule {
+    background-color: #f44336;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    cursor: pointer;
+}
+
+.end-schedule:hover {
+    background-color: #d32f2f;
+}
+
+.update-btn {
+    background-color: #4CAF50; /* Green */
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 14px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 12px;
+}
+
+.delete-btn {
+    background-color: #f44336; /* Red */
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 14px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 12px;
+}

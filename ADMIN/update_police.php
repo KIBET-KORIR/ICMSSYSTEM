@@ -29,12 +29,13 @@ function generateRandomPassword($length = 8) {
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Retrieve form data and sanitize
     $police_id = mysqli_real_escape_string($conn, $_POST['police_id']);
+    $police_email = mysqli_real_escape_string($conn, $_POST['police_email']);
 
     // Generate a random password
     $randomPassword = generateRandomPassword();
 
-    // Update the police record with new password
-    $update_query = "UPDATE police SET password = '$randomPassword' WHERE police_id = '$police_id'";
+    // Update the police record with new email and password
+    $update_query = "UPDATE police SET police_email = '$police_email', password = '$randomPassword' WHERE police_id = '$police_id'";
     
     if (mysqli_query($conn, $update_query)) {
         // Retrieve police officer details for email
@@ -43,7 +44,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         
         if (mysqli_num_rows($result) == 1) {
             $row = mysqli_fetch_assoc($result);
-            $police_email = $row['police_email'];
             $name = $row['name'];
             
             // Send email with new password
@@ -79,7 +79,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $mail->send();
 
                 // Set success message after email is sent
-                $success_message = "Password updated successfully! Temporary password sent to the email.";
+                $success_message = "Details updated successfully! Temporary password sent to the email.";
             } catch (Exception $e) {
                 // Error sending email
                 $error_message = "Error sending email: {$mail->ErrorInfo}";
@@ -88,7 +88,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $error_message = "Error: Police officer not found.";
         }
     } else {
-        $error_message = "Error updating password: " . mysqli_error($conn);
+        $error_message = "Error updating details: " . mysqli_error($conn);
     }
 }
 
@@ -124,11 +124,5 @@ mysqli_close($conn);
             });
         </script>
     <?php endif; ?>
-    <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
-        <label for="police_id">Police ID:</label>
-        <input type="text" id="police_id" name="police_id" value="<?php echo $police_id; ?>" required><br><br>
-        
-        <button type="submit">Update Password</button>
-    </form>
 </body>
 </html>

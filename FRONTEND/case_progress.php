@@ -1,6 +1,7 @@
 <?php
 // Start the session
 include './constants/authenticator.php';
+include './constants/navigation.php';
 include '../Database/db_con.php';
 
 // Check if the user is logged in (i.e., if their session is set)
@@ -99,9 +100,56 @@ if (isset($_SESSION['email'])) {
                     text-decoration: none;
                     cursor: pointer;
                 }
+                /* Styles for navigation buttons */
+                .nav-buttons {
+                    display: flex;
+                    justify-content: center;
+                    margin: 20px;
+                }
+                .nav-buttons button {
+                    padding: 10px 20px;
+                    font-size: 16px;
+                    cursor: pointer;
+                    border: none;
+                    color: white;
+                    border-radius: 5px;
+                    margin: 0 10px;
+                    transition: background-color 0.3s;
+                }
+                .prev-button {
+                    background-color: #007BFF; /* Blue */
+                }
+                .next-button {
+                    background-color: #28A745; /* Green */
+                }
+                .nav-buttons button:hover {
+                    opacity: 0.8;
+                }
+
+                .popup-link {
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 16px;
+    color: white;
+    background-color: #007bff; /* Blue */
+    border-radius: 5px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+    text-align: center;
+}
+
+.popup-link:hover {
+    background-color: #0056b3; /* Darker blue */
+    transform: scale(1.05); /* Slightly enlarge on hover */
+}
+
             </style>
         </head>
         <body>
+            <!-- Include navigation buttons here -->
+           <!-- ?php include './constants/navigation.php'; ?>-->
+
             <div class="container">
                 <div class="form-container">
                     <h2>User Case Details</h2>
@@ -167,7 +215,6 @@ if (isset($_SESSION['email'])) {
                         <p><strong>Description:</strong> ${data.description}</p>
                         <p><strong>OB Number:</strong> ${data.ob_number}</p>
                         <p><strong>Investigation Status:</strong> ${data.investigation_status}</p>
-                        <p><strong>Closure Parameters:</strong> ${data.closure_parameters}</p>
                         <p><strong>Case Status:</strong> ${data.case_status}</p>
                     `;
                     document.getElementById('caseDetailsContent').innerHTML = content;
