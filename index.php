@@ -92,7 +92,36 @@
                     <p>You can report a case by visiting our station, calling our hotline, or using our online reporting system.</p>
                 </div>
             </div>
-            <!-- Additional FAQ items -->
+            <div class="faq-item">
+                <button class="faq-question">What should I do if I witness a crime?</button>
+                <div class="faq-answer">
+                    <p>If you witness a crime, you should contact the police immediately and provide as much detail as possible.</p>
+                </div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question">How can I check the status of my report?</button>
+                <div class="faq-answer">
+                    <p>You can check the status of your report by logging into our online system or contacting the station directly.</p>
+                </div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question">What types of crimes can be reported online?</button>
+                <div class="faq-answer">
+                    <p>You can report various types of crimes online, including theft, vandalism, and non-emergency incidents. For emergencies, please call our hotline.</p>
+                </div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question">Are anonymous reports accepted?</button>
+                <div class="faq-answer">
+                    <p>No we dont accept anonymous case or crime occurence reporting One must login to the system to report an incidents.</p>
+                </div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question">What should I do if I lost my belongings?</button>
+                <div class="faq-answer">
+                    <p>If you lost your belongings, you should file a lost property report at our station or through our online system.</p>
+                </div>
+            </div>
         </section>
         <section class="criminals">
             <h2>Notorious Criminals</h2>
